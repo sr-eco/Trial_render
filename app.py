@@ -246,94 +246,7 @@ def update_main_tab(selected_tab):
         print(f"Error in update_main_tab: {e}")
         return html.Div(f"Error: {e}")
 
-# # ✅ Callback to load AgGrid only when "compare" tab is active
-# @app.callback(
-#     Output("compare-grid-container", "children"),
-#     Input("main-tabs", "value")
-# )
-# def update_compare_layout(tab_value):
-#     if tab_value == "compare":
-#         return AgGrid(
-#             id="compare-grid",
-#             columnDefs=[{"headerName": col, "field": col} for col in df.columns],
-#             rowData=df.to_dict("records"),
-#             defaultColDef={"sortable": True, "filter": True, "resizable": True},
-#             pagination=True,
-#             paginationPageSize=25,
-#         )
-#     return None  # Ensures the grid is hidden when switching tabs
 
-
-
-# def get_compare_layout():
-#     return html.Div([
-#         # AG Grid table
-#         AgGrid(
-#             id="compare-grid",
-#             columnDefs=[],  # Will be dynamically set in callback
-#             rowData=[],  # Will be updated in callback
-#             defaultColDef={"sortable": True, "filter": True, "resizable": True},
-#             pagination=True,  # Enable pagination
-#             paginationPageSize=25,  # Default page size
-#         ),
-
-#         # Grid for log checkbox (left) and rows-per-page dropdown (right)
-#         dmc.Grid(
-#             gutter="xs",
-#             children=[
-#                 dmc.Col(
-#                     dcc.Checklist(
-#                         id="show-log-values",
-#                         options=[{"label": " Show Log Values", "value": "on"}],
-#                         value=[],  # Default unchecked
-#                         inline=True
-#                     ),
-#                     span=6,  # Takes half the width
-#                     style={"textAlign": "left"}
-#                 ),
-#                 dmc.Col(
-#                     dcc.Dropdown(
-#                         id="rows-per-page",
-#                         options=[{"label": str(n), "value": n} for n in [10, 25, 50, 100]],
-#                         value=25,
-#                         clearable=False
-#                     ),
-#                     span=6,  # Takes half the width
-#                     style={"textAlign": "right"}
-#                 ),
-#             ]
-#         )
-#     ])
-
-
-# # ✅ Update Main Tabs
-# @app.callback(
-#     Output("tabs-content", "children"),
-#     Input("main-tabs", "value")
-# )
-# def update_main_tab(tab):
-#     print(f"Switched to tab: {tab}")  # Debugging statement
-#     return get_explore_layout() if tab == "explore" else get_compare_layout()
-
-# # ✅ Render AG Grid only when "compare" tab is active
-# @callback(
-#     Output("compare-grid-container", "children"),
-#     Input("main-tabs", "value"),
-#     prevent_initial_call=True
-# )
-# def render_aggrid(tab):
-#     if tab != "compare":
-#         return []  # No grid if tab isn't "compare"
-    
-#     # Return AgGrid component when tab is "compare"
-#     return AgGrid(
-#         id="compare-grid",
-#         columnDefs=[],  # Will be set dynamically
-#         rowData=[],  # Will be updated dynamically
-#         defaultColDef={"sortable": True, "filter": True, "resizable": True},
-#         pagination=True,
-#         paginationPageSize=25,  # Default
-#     )
     
 # ✅ Update Districts Based on Selected States
 @app.callback(
@@ -434,25 +347,16 @@ def update_explore_graph(x_var, y_var, size_var, selected_states, selected_distr
             expanded_states.add(state)  # It's an individual state
             
 
-    # # Get districts based on expanded states
-    # filtered_districts = sorted(df[df["state"].isin(expanded_states)]["district"].unique())
-
+    
     df_filtered = df[df["state"].isin(expanded_states)]
-    # df_filtered["state"] = pd.Categorical(df_filtered["state"], categories=sorted(df_filtered["state"].unique()), ordered=True)
-
+    
     if selected_districts:
         df_filtered = df_filtered[df_filtered["district"].isin(selected_districts)]
 
     if df_filtered.empty:
         return px.scatter(title="No data available for selected filters")
 
-    # # Apply log transformation if selected
-    # if log_option == "log":
-    #     df_filtered = df_filtered.copy()
-    #     df_filtered[x_var] = df_filtered[x_var].replace(0, np.nan)
-    #     df_filtered[y_var] = df_filtered[y_var].replace(0, np.nan)
-    #     df_filtered[x_var] = np.log1p(df_filtered[x_var])
-    #     df_filtered[y_var] = np.log1p(df_filtered[y_var])
+    
 
     # Define margins for better visibility
     x_margin = (df_filtered[x_var].max() - df_filtered[x_var].min()) * 0.05  # 5% of the range
@@ -511,14 +415,7 @@ def update_explore_graph(x_var, y_var, size_var, selected_states, selected_distr
         render_mode="svg"
     )
 
-    # # ❌ Hide x-axis labels but keep range_x applied
-    # if x_var == "year":
-    #     fig.update_xaxes(
-    #         showticklabels=False,  # Hides x-axis labels
-    #         title=None,            # Removes title
-    #         showgrid=True,         # Keeps grid visible for context
-    #         zeroline=False         # Hides zero line
-    #     )
+    
 
 
     fig.update_layout(coloraxis_colorbar_title=y_var)
