@@ -49,7 +49,7 @@ log_columns = ["log_area", "log_pop11", "log_nightlights", "log_forest_cover", "
 # ✅ Initialize Dash App
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 server = app.server
-app.title = "Environmental Dashboard"
+app.title = "SHRUG Data Dashboard"
 
 # ✅ Exploration Layout
 def get_explore_layout():
@@ -72,7 +72,7 @@ def get_explore_layout():
                 dcc.Dropdown(
                     id="y-variable-dropdown",
                     options=[{"label": k.replace("_", " ").title(), "value": k} for k in df.columns if k not in ["state", "district", "pc11_state_id", "pc11_district_id", "pop_cat", "area_cat", "year"]],
-                    value="nightlights",
+                    value="log_nightlights",
                     clearable=False,
                     style={"width": "200px"}
                 ),
@@ -83,7 +83,7 @@ def get_explore_layout():
                 dcc.Dropdown(
                     id="size-variable-dropdown",
                     options=[{"label": k.replace("_", " ").title(), "value": k} for k in df.columns if k not in ["state", "district", "year", "pc11_state_id", "pc11_district_id", "pop_cat", "area_cat"]],
-                    value="pop11",  # Default size variable
+                    value="pm25",  # Default size variable
                     clearable=True,
                     style={"width": "200px"}
                 ),
@@ -93,67 +93,77 @@ def get_explore_layout():
         # Loading Wrapper
         dcc.Loading(
             id="loading-explore-graph",
-            type="circle",  # You can use "default", "circle", or "dot"
+            type="circle",
             children=[dcc.Graph(id="explore-graph")]
         ),
-        # # Graph
-        # dcc.Graph(id="explore-graph"),
 
+        # State & District Selection
         html.Div([
-    html.Div([
-        # html.Label("Select State:", style={"font-weight": "bold"}),
-        dmc.Popover(
-            width=300,
-            position="bottom",
-            withArrow=True,
-            shadow="md",
-            children=[
-                dmc.PopoverTarget(dmc.Button("Select States")),
-                dmc.PopoverDropdown(
-                    dmc.MultiSelect(
-                        id="state-dropdown",
-                        data=[
-                        {"label": "All States", "value": "All-states"},
-                        {"label": "Large States", "value": "Large-states"},
-                        {"label": "Medium States", "value": "Medium-states"},
-                        {"label": "Small States", "value": "Small-states"},
-                        {"label": "High Population States", "value": "High-pop"},
-                        {"label": "Medium Population States", "value": "Medium-pop"},
-                        {"label": "Low Population States", "value": "Low-pop"},
-                        ] + [{"label": s, "value": s} for s in unique_states],
-                        value=["Large-states"],  # Select all by default
-                        searchable=True,
-                        clearable=True,
-                        style={"width": "100%"},
-                        comboboxProps={"position": "top", "middlewares": {"flip": False, "shift": False}}
-                    )
+            html.Div([
+                dmc.Popover(
+                    width=300,
+                    position="bottom",
+                    withArrow=True,
+                    shadow="md",
+                    children=[
+                        dmc.PopoverTarget(dmc.Button("Select States")),
+                        dmc.PopoverDropdown(
+                            dmc.MultiSelect(
+                                id="state-dropdown",
+                                data=[
+                                    {"label": "All States", "value": "All-states"},
+                                    {"label": "Large States", "value": "Large-states"},
+                                    {"label": "Medium States", "value": "Medium-states"},
+                                    {"label": "Small States", "value": "Small-states"},
+                                    {"label": "High Population States", "value": "High-pop"},
+                                    {"label": "Medium Population States", "value": "Medium-pop"},
+                                    {"label": "Low Population States", "value": "Low-pop"},
+                                ] + [{"label": s, "value": s} for s in unique_states],
+                                value=["High-pop"],  
+                                searchable=True,
+                                clearable=True,
+                                style={"width": "100%"},
+                                comboboxProps={"position": "top", "middlewares": {"flip": False, "shift": False}}
+                            )
+                        ),
+                    ],
                 ),
-            ],
-        ),
-    ], style={"width": "30%"}),
+            ], style={"width": "30%"}),
 
-    html.Div([
-        # html.Label("Select District:", style={"font-weight": "bold"}),
-        dmc.Popover(
-            width=300,
-            position="bottom",
-            withArrow=True,
-            shadow="md",
-            children=[
-                dmc.PopoverTarget(dmc.Button("Select Districts")),
-                dmc.PopoverDropdown(
-                    dmc.MultiSelect(
-                        id="district-dropdown",
-                        searchable=True,
-                        clearable=True,
-                        style={"width": "100%"},
-                        comboboxProps={"position": "top", "middlewares": {"flip": False, "shift": False}}
-                    )
+            html.Div([
+                dmc.Popover(
+                    width=300,
+                    position="bottom",
+                    withArrow=True,
+                    shadow="md",
+                    children=[
+                        dmc.PopoverTarget(dmc.Button("Select Districts")),
+                        dmc.PopoverDropdown(
+                            dmc.MultiSelect(
+                                id="district-dropdown",
+                                searchable=True,
+                                clearable=True,
+                                style={"width": "100%"},
+                                comboboxProps={"position": "top", "middlewares": {"flip": False, "shift": False}}
+                            )
+                        ),
+                    ],
                 ),
-            ],
-        ),
-    ], style={"width": "30%"}),
-], style={"display": "flex", "justify-content": "space-between", "margin-top": "10px"}),
+            ], style={"width": "30%"}),
+        ], style={"display": "flex", "justify-content": "space-between", "margin-top": "10px"}),
+
+        # ✅ Explanatory Text at the End
+        html.Div([
+            dcc.Markdown("""
+            **Note1:**  
+                
+            - **States** can be selected in groups based on categories. The default selection is **High Population States**.  
+            - **Districts** can be selected based on the chosen states.  
+            - **X-axis** and **Y-axis** variables can be selected from the dropdowns.  
+            - **Bubble size** can be selected from the dropdown and can also be set to **None**.  
+
+            """, style={"margin-top": "20px", "font-size": "14px", "line-height": "1.5"})
+        ])
     ])
 
 
@@ -198,22 +208,36 @@ app.layout = dmc.MantineProvider(
             children=[
                 dmc.Tabs(
                     id="main-tabs",
-                    value="explore",
+                    value="compare",
                     variant="pills",  # Soft pill-styled tabs
                     color="gray",
                     children=[
                         dmc.TabsList(
                             grow=True,
                             children=[
-                                dmc.TabsTab("📊 Graphical Exploration", value="explore", style={"fontWeight": "bold"}),
                                 dmc.TabsTab("🔄 Tabular Data", value="compare", style={"fontWeight": "bold"}),
+                                dmc.TabsTab("📊 Graphical Exploration", value="explore", style={"fontWeight": "bold"}),
                             ],
                         ),
                     ],
                 ),
                 dmc.Space(h=10),  # Adds spacing below tabs
                 dmc.Container(
-                    html.Div(id="tabs-content"),
+                    children=[
+                        html.Div(id="tabs-content"),
+                        dmc.Space(h=20),  # Spacing before the note
+                        dcc.Markdown("""
+                        **Note:**  
+                        All data is at the level of **Year × State × District**.
+                        Available datapoints are Year, State, District, Area Category, Population Category, Area, Population, Nightlights, Forest Cover, and PM2.5.
+
+                        - **Area**: Land area (in sq km) as per the 2011 Census.  
+                        - **Pop11**: Population count from the 2011 Census.  
+                        - **Nightlights**: Mean/median nightlights detected.  
+                        - **Forest Cover**: Mean percentage tree cover.  
+                        - **PM2.5**: Mean PM2.5 detected (air pollution measure).  
+                        """, style={"font-size": "14px", "line-height": "1.5"})
+                    ],
                     fluid=True,
                     style={
                         "backgroundColor": "#FFF5F5",  # Very Soft Pinkish-Red
@@ -226,6 +250,7 @@ app.layout = dmc.MantineProvider(
         ),
     ],
 )
+
 
 
 # ✅ Callback to update main tab content
