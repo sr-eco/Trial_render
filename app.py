@@ -157,10 +157,10 @@ def get_explore_layout():
             dcc.Markdown("""
             **Note1:**  
                 
-            - **States** can be selected in groups based on categories. The default selection is **High Population States**.  
-            - **Districts** can be selected based on the chosen states.  
-            - **X-axis** and **Y-axis** variables can be selected from the dropdowns.  
-            - **Bubble size** can be selected from the dropdown and can also be set to **None**.  
+            - **States** can be selected/deselected individually and/or in groups based on categories. Deselection of groups of states is not possible. The default selection is **High Population States**. All selections are clearable.
+            - **Districts** can be selected/deselected based on the chosen states.  
+            - **X-axis** and **Y-axis** variables can be selected from the dropdowns. By default these are Forest Cover and Log Nightlights.  
+            - **Bubble size** can be selected from the dropdown and is also clearable.  
 
             """, style={"margin-top": "20px", "font-size": "14px", "line-height": "1.5"})
         ])
@@ -206,6 +206,8 @@ app.layout = dmc.MantineProvider(
             p="md",
             style={"backgroundColor": "#FAE3E3"},  # Soft pastel background
             children=[
+                # Dashboard Title
+                dmc.Title("SHRUG Data Dashboard", order=1, style={"marginBottom": "20px", "textAlign": "left"}),
                 dmc.Tabs(
                     id="main-tabs",
                     value="compare",
