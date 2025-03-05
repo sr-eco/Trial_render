@@ -5,3 +5,5 @@ flask-caching
 dash-mantine-components
 dash-ag-grid
 gunicorn
+parquet
+pyarrow
