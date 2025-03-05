@@ -4,3 +4,4 @@ plotly  # Interactive visualizations (for creating charts, scatter plots, etc.)
 flask-caching
 dash-mantine-components
 dash-ag-grid
+gunicorn
