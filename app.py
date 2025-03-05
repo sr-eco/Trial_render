@@ -48,6 +48,7 @@ log_columns = ["log_area", "log_pop11", "log_nightlights", "log_forest_cover", "
 
 # ✅ Initialize Dash App
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
+server = app.server
 app.title = "Environmental Dashboard"
 
 # ✅ Exploration Layout
@@ -567,4 +568,4 @@ def update_table(log_toggle):
 
 # ✅ Run App
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
