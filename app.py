@@ -206,7 +206,7 @@ app.layout = dmc.MantineProvider(
                             grow=True,
                             children=[
                                 dmc.TabsTab("📊 Graphical Exploration", value="explore", style={"fontWeight": "bold"}),
-                                dmc.TabsTab("🔄 Data and Regressions", value="compare", style={"fontWeight": "bold"}),
+                                dmc.TabsTab("🔄 Tabular Data", value="compare", style={"fontWeight": "bold"}),
                             ],
                         ),
                     ],
