@@ -188,8 +188,17 @@ def get_compare_layout():
                 options=[{"label": "Show Log Values", "value": "show"}],
                 value=[]
             )
-        ], style={"display": "flex", "gap": "10px"})
+        ], style={"display": "flex", "gap": "10px"}),
+
+        # Adding the note at the bottom
+        html.Div([
+            dcc.Markdown(
+                "**Note1:** Columns are **sortable, filterable, and resizable**. Toggle 'Show Log Values' for log transformation of variable columns.",
+                style={"fontSize": "14px", "marginTop": "15px", "color": "#555"}
+            )
+        ])
     ])
+
 
 
 
@@ -463,7 +472,9 @@ def update_table(log_toggle):
     valid_columns = [col for col in display_columns if col in df.columns]
 
     # Sort and filter dataframe
-    df_sorted1 = df.dropna(subset=["year", "state", "district"]).sort_values(["year", "state", "district"])[valid_columns]
+    df_sorted1 = df.dropna(subset=["year", "state", "district"]) \
+               .sort_values(["year", "state", "district"], ascending=[False, True, True])[valid_columns]
+
     # ✅ Format float columns to 2 decimal places using .map()
     float_cols = df_sorted1.select_dtypes(include=["float"]).columns  # Identify float columns
     for col in float_cols:
